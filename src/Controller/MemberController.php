@@ -53,11 +53,17 @@ class MemberController extends AbstractController
      */
     public function show($id)
     {
-        // return $this->json($member);
+        $member = $this->getDoctrine()->getRepository(Member::class)->find($id);
 
-        $id = $this->getDoctrine()->getRepository(Member::class)->find($id);
+   
 
-        return $this->json($id);
+        if($member === null) {
+            return $this->json([
+                "404"=>"沒有這一筆資料"
+                ] 
+            );
+        }
+        return $this->json($member);
     }
 
     //修改資料的api
