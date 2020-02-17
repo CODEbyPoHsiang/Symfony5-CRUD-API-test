@@ -19,7 +19,7 @@ class MemberController extends AbstractController
 {
     //顯示全部資料api
     /**
-     * @Route("/", name="member",methods="GET")
+     * @Route("/", name="index",methods="GET")
      */
     public function index(MemberRepository $memberRepository): Response
     {
@@ -27,10 +27,10 @@ class MemberController extends AbstractController
     }
     //新增資料api
       /**
-     * @Route("/new", name="member_new", methods="POST")
+     * @Route("/new", name="create", methods="POST")
      * 
      */
-    public function new(Request $request)
+    public function create(Request $request)
     {
         $data = $request->getContent();
         parse_str($data,$data_arr);
@@ -46,27 +46,65 @@ class MemberController extends AbstractController
 
     //   return $this->json($member);
     }
-    //查看單一筆資料
+
+    //查看單一筆資料api
     /**
-     * @Route("/{id}", name="member_show", methods="GET")
+     * @Route("/{id}", name="show", methods="GET")
      */
-    public function show(Member $member): Response
+    public function show($id)
     {
-        return $this->json($member);
+        // return $this->json($member);
+
+        $id = $this->getDoctrine()->getRepository(Member::class)->find($id);
+
+        return $this->json($id);
     }
-    //剩下修改的api
-    //https://www.youtube.com/watch?v=TcnQD7C5KK0
-    //https://github.com/sadikoff/sf4-api-example/blob/master/src/Controller/RecordController.php
 
+    //修改資料的api
+    /**
+     * @Route("/edit/{id}", name="update",methods="PUT")
+     */
+    public function update($id,Request $request)
+    {
+      $data =$request->request->all();
 
+      $doctrine = $this->getDoctrine();
 
+      $member = $doctrine->getRepository(Member::class)->find($id);
 
+    //   dd($member);
 
+      if($request->request->has("name"))
+        $member->setName($data["name"]);
+      if($request->request->has("ename"))
+        $member->setEname($data["ename"]);
+      if($request->request->has("phone"))
+        $member->setPhone($data["phone"]);
+      if($request->request->has("email"))
+        $member->setEmail($data["email"]);
+      if($request->request->has("sex"))
+        $member->setSex($data["sex"]);
+      if($request->request->has("city"))
+        $member->setCity($data["city"]);
+      if($request->request->has("township"))
+        $member->setTownship($data["township"]);
+      if($request->request->has("postcode"))
+        $member->setPostcode($data["postcode"]);
+      if($request->request->has("address"))
+        $member->setAddress($data["address"]);
+      if($request->request->has("notes"))
+        $member->setNotes($data["notes"]);
 
+        $manager = $doctrine->getManager();
+        $manager->flush();
+        
+        return new JsonResponse(["200" => "資料修改成功"]);
+        // return $this->json(["data" => "ok"]);
+    }
 
      //刪除一筆資料
     /**
-     * @Route("/{id}", methods="DELETE")
+     * @Route("/{id}", name="delete",methods="DELETE")
      */
     public function delete(Member $id)
     {
